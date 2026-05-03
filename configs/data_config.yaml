@@ -1,0 +1,23 @@
+# Data configuration for DD2424 Group 48 project
+
+dataset:
+  name: OxfordIIITPet
+  root: ./data
+  download: true
+
+splits:
+  seed: 42
+  validation_fraction: 0.10
+  label_budgets:
+    - 1.0
+    - 0.1
+    - 0.01
+  imbalance:
+    enabled: true
+    minority_group: cat_breeds
+    keep_fraction: 0.20
+
+dataloader:
+  image_size: 224
+  batch_size: 64
+  num_workers: 2
