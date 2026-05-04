@@ -6,9 +6,6 @@ This script creates:
 2. Stratified label-budget subsets: 100%, 10%, and 1%.
 3. A class-imbalanced training split where cat breeds are reduced to 20%.
 
-Run from the project root:
-
-    python scripts/make_splits.py
 """
 
 import json

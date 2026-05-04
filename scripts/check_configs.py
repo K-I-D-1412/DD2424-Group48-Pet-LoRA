@@ -1,9 +1,5 @@
 """
 Check that all YAML configuration files can be parsed.
-
-Run from the project root:
-
-    python -m scripts.check_configs
 """
 
 from pathlib import Path

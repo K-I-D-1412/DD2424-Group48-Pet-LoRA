@@ -1,9 +1,5 @@
 """
 Quick sanity check for the data loading pipeline.
-
-Run from the project root:
-
-    python -m scripts.check_dataloaders
 """
 
 from src.data import get_dataloaders_for_split, get_test_dataloader
