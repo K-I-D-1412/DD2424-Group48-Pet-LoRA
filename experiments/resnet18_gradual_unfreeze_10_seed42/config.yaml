@@ -1,0 +1,37 @@
+experiment:
+  name: resnet18_gradual_unfreeze_10_seed42
+  description: Strategy 2, gradual unfreezing on 10% training data.
+  seed: 42
+data:
+  dataset: OxfordIIITPet
+  train_split: train_10_seed42
+  val_split: val_seed42
+  test_split: official_test
+  image_size: 224
+  use_augmentation: true
+  use_oversampling: false
+  use_weighted_loss: false
+model:
+  architecture: resnet18
+  pretrained: true
+  num_classes: 37
+  strategy: gradual_unfreezing
+  gradual_unfreezing_schedule:
+  - epoch: 0
+    unfreeze_blocks: 1
+  - epoch: 5
+    unfreeze_blocks: 2
+  - epoch: 10
+    unfreeze_blocks: 3
+  - epoch: 15
+    unfreeze_blocks: 4
+training:
+  epochs: 30
+  batch_size: 64
+  optimizer: adamw
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  num_workers: 2
+logging:
+  output_dir: experiments/resnet18_gradual_unfreeze_10_seed42
+  save_best_checkpoint: true

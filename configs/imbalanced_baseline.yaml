@@ -1,0 +1,33 @@
+experiment:
+  name: resnet18_finetune_imbalanced_baseline_seed42
+  description: Imbalance baseline. Cat breeds reduced to 20%, NO compensation (no weighted CE, no oversampling). Baseline to compare weighted_ce and oversampling against.
+  seed: 42
+
+data:
+  dataset: OxfordIIITPet
+  train_split: train_imbalanced_cat20_seed42
+  val_split: val_seed42
+  test_split: official_test
+  image_size: 224
+  use_augmentation: true
+  use_oversampling: false
+  use_weighted_loss: false
+
+model:
+  architecture: resnet18
+  pretrained: true
+  num_classes: 37
+  strategy: full_finetuning
+  unfrozen_layers: all
+
+training:
+  epochs: 30
+  batch_size: 64
+  optimizer: adamw
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  num_workers: 2
+
+logging:
+  output_dir: experiments/resnet18_finetune_imbalanced_baseline_seed42
+  save_best_checkpoint: true

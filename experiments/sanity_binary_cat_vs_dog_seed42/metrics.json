@@ -1,0 +1,8 @@
+{
+  "experiment": "sanity_binary_cat_vs_dog",
+  "epochs": 10,
+  "test_top1": 0.9831016625783592,
+  "test_macro_f1": 0.9805319310631911,
+  "trainable_params": 1026,
+  "training_time_seconds": 708.2
+}
