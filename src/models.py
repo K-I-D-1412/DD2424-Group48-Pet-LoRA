@@ -3,6 +3,8 @@ Model construction utilities.
 
 This module currently supports ResNet-18 for the baseline transfer learning
 experiments. LoRA integration will be added later by the LoRA lead.
+
+Jingmeng - freeze_all_except_last_n_blocks + configure_model_for_strategy  (Strategy 1)
 """
 
 import torch

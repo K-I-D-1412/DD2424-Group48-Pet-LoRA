@@ -1,5 +1,5 @@
 """
-Gradual unfreezing scheduler for Strategy 2.
+Jingmeng - Gradual unfreezing scheduler for Strategy 2.
 """
 
 from __future__ import annotations

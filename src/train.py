@@ -2,6 +2,10 @@
 Training entry point.
 
 Jingmeng - build the baselines training with 2 strategies, and save the training results.
+    train_from_config
+    unfrozen_layers (Strategy 1)
+    gradual unfreezing scheduler (Strategy 2)
+
 
 Usage:
     python -m src.train --config configs/linear_probe_100.yaml
