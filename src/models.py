@@ -87,6 +87,7 @@ def configure_model_for_strategy(
     model: nn.Module,
     strategy: str,
     unfrozen_layers=None,
+    lora_cfg: dict | None = None,
 ) -> nn.Module:
     """
     Based on the "strategy" field, which parameters can be trained.
@@ -116,9 +117,8 @@ def configure_model_for_strategy(
         freeze_backbone_for_linear_probe(model)
 
     elif strategy == "lora":
-        raise NotImplementedError(
-            "The LoRA strategy has not been implemented. Waiting for src/lora.py."
-        )
+        from src.lora import apply_lora_to_resnet18
+        model = apply_lora_to_resnet18(model, lora_cfg=lora_cfg)
 
     else:
         raise ValueError(f"Unknown strategy: '{strategy}'")

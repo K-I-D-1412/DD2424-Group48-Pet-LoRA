@@ -164,8 +164,12 @@ def train_from_config(config_path: str):
 # Adding unfrozen_layers
     strategy = model_cfg["strategy"].lower()
     unfrozen_layers = model_cfg.get("unfrozen_layers", None)
+    lora_cfg = config.get("lora", None)
     model = configure_model_for_strategy(
-        model=model, strategy=strategy, unfrozen_layers=unfrozen_layers
+        model=model,
+        strategy=strategy,
+        unfrozen_layers=unfrozen_layers,
+        lora_cfg=lora_cfg,
     )
     model = model.to(device)
 
@@ -303,6 +307,7 @@ def train_from_config(config_path: str):
     final_metrics = {
         "experiment_name": config["experiment"]["name"],
         "strategy": strategy,
+        "lora": config.get("lora", None),
         "train_split": data_cfg["train_split"],
         "val_split": data_cfg["val_split"],
         "epochs_run": epochs,
