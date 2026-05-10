@@ -1,6 +1,8 @@
 """
 Training entry point.
 
+Jingmeng - build the baselines training with 2 strategies, and save the training results.
+
 Usage:
     python -m src.train --config configs/linear_probe_100.yaml
     python -m src.train --config configs/finetune_100.yaml
@@ -45,7 +47,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 # ---------------------------------------------------------------------------
-# Optimizer / loss factories  (same as Step 4)
+# Optimizer / loss factories 
 # ---------------------------------------------------------------------------
 
 def build_optimizer(model: nn.Module, config: dict) -> torch.optim.Optimizer:
@@ -77,7 +79,7 @@ def build_loss(config: dict, class_weights: torch.Tensor, device: torch.device) 
 
 
 # ---------------------------------------------------------------------------
-# I/O helpers (NEW in Step 5)
+# I/O helpers 
 # ---------------------------------------------------------------------------
 
 def save_training_curves(history: list, path: Path):
@@ -126,7 +128,7 @@ def train_from_config(config_path: str):
         output_dir = PROJECT_ROOT / output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # NEW in Step 5: snapshot the resolved config first thing.
+    # snapshot the resolved config first thing.
     save_yaml_copy(config, output_dir / "config.yaml")
 
     # ---------------- data ----------------
@@ -209,7 +211,7 @@ def train_from_config(config_path: str):
 
     # ---------------- main training loop ----------------
     epochs = int(training_cfg["epochs"])
-    history: list = []                                              # NEW: per-epoch records
+    history: list = []         # per-epoch records
     best_val_top1 = -1.0
     best_epoch = -1
     best_ckpt_path = output_dir / "best_model.pt"
@@ -247,7 +249,7 @@ def train_from_config(config_path: str):
                 torch.save(model.state_dict(), best_ckpt_path)
             marker = "  *new best*"
 
-        # NEW: accumulate every epoch into history for the CSV.
+        # accumulate every epoch into history for the CSV.
         record = {
             "epoch": epoch,
             "train_loss": round(train_metrics["loss"], 6),
@@ -270,7 +272,7 @@ def train_from_config(config_path: str):
 
     total_train_time = time.time() - train_start
 
-    # NEW: persist curves first thing, even before the test eval might fail.
+    # persist curves first thing, even before the test eval might fail.
     save_training_curves(history, output_dir / "training_curves.csv")
 
     print("=" * 80)
@@ -286,8 +288,8 @@ def train_from_config(config_path: str):
         model.load_state_dict(torch.load(best_ckpt_path, map_location=device))
         print(f"Loaded best checkpoint from {best_ckpt_path}")
 
-    # NEW: re-evaluate on val WITH predictions, to compute per-class metrics
-    # and confusion matrix for the saved best model.
+    # re-evaluate on val WITH predictions, to compute per-class metrics
+    # confusion matrix for the saved best model.
     val_best = evaluate(
         model=model, loader=val_loader, loss_fn=loss_fn,
         device=device, num_classes=num_classes,
@@ -356,7 +358,7 @@ def train_from_config(config_path: str):
         except Exception as exc:
             print(f"[Warning] test-set evaluation failed: {exc!r}")
 
-    # NEW: write metrics.json and best_predictions.npz
+    # write metrics.json and best_predictions.npz
     with (output_dir / "metrics.json").open("w", encoding="utf-8") as f:
         json.dump(final_metrics, f, indent=2)
 
