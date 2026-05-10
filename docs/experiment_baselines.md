@@ -294,8 +294,7 @@ To collect results across all completed experiments, iterate over
 
 ## Known Limitations
 
-- The binary sanity check reaches 98.3% rather than ≥99%. Lowering the learning
-  rate from 1e-3 to 1e-4 is expected to resolve this.
+- The binary sanity check reaches 98.3% rather than ≥99%.
 
 - The best test top-1 across all strategies is 87.4%. The best validation top-1
   is 92.4%. The gap reflects variance from the small validation set (368
