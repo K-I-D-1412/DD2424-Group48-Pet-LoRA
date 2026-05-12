@@ -25,14 +25,19 @@ We also investigate limited-data settings, class imbalance, data augmentation, r
 ## Repository Structure
 
 ```text
-configs/      Experiment configuration files
-src/          Core source code
-scripts/      Helper scripts for running experiments
-experiments/  Experiment logs and lightweight result files
-results/      Final tables and figures
-notebooks/    Exploratory notebooks
-report/       Report-related figures and notes
-docs/         Planning documents and task allocation
+configs/          Experiment configuration files
+src/              Core source code
+scripts/          Helper scripts for running experiments
+                  and plotting (scripts/plot_*.py)
+experiments/      Experiment logs and lightweight result files
+results/          Final tables and figures
+results/figures/  Generated PNGs grouped by topic:
+                    training_curves/, confusion_matrices/,
+                    per_class_f1/, lora_params_vs_acc/,
+                    representation/, training_cost/
+notebooks/        Exploratory notebooks
+report/           Report-related figures and notes
+docs/             Planning documents and task allocation
 ```
 
 ## Setup
