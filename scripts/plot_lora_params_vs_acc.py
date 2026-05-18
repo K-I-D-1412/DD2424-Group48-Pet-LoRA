@@ -51,6 +51,10 @@ def collect_lora() -> dict[str, dict[str, list[tuple[int, float, int]]]]:
     rows = read_csv(LORA_CSV)
     out: dict[str, dict[str, list[tuple[int, float, int]]]] = {}
     for r in rows:
+        # Exclude learning-rate control runs; they belong to the LR
+        # sensitivity table, not the placement/rank scatter plot.
+        if "lr1e4" in r["experiment"]:
+            continue
         budget = parse_budget(r["budget"])
         family = infer_lora_family(r["targets"])
         params = int(r["trainable_params"])
