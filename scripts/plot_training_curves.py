@@ -37,7 +37,7 @@ GROUPS: dict[str, list[tuple[str, str]]] = {
         ("resnet18_linear_probe_100_seed42", "Linear probe"),
         ("resnet18_finetune_100_seed42", "Full fine-tune"),
         ("resnet18_gradual_unfreeze_100_seed42", "Gradual unfreeze"),
-        ("resnet18_lora_layer4_r4_100_seed42", "Layer4-LoRA r=4"),
+        ("resnet18_lora_layer3_r4_100_seed42", "Layer3-LoRA r=4"),
     ],
     "baselines_10": [
         ("resnet18_linear_probe_10_seed42", "Linear probe"),
