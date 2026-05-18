@@ -1,0 +1,48 @@
+experiment:
+  name: resnet18_lora_layer4_layer3_r4_1_seed42
+  description: LoRA layer4+layer3 on ResNet-18 using rank r=4 and 1% of the training
+    data.
+  seed: 42
+data:
+  dataset: OxfordIIITPet
+  train_split: train_1_seed42
+  val_split: val_seed42
+  test_split: official_test
+  image_size: 224
+  use_augmentation: true
+  use_oversampling: false
+  use_weighted_loss: false
+model:
+  architecture: resnet18
+  pretrained: true
+  num_classes: 37
+  strategy: lora
+  freeze_backbone: true
+lora:
+  enabled: true
+  rank: 4
+  alpha: 8
+  dropout: 0.05
+  target_modules:
+  - layer4
+  - layer3
+  train_classifier: true
+training:
+  epochs: 30
+  batch_size: 64
+  optimizer: adamw
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  num_workers: 2
+evaluation:
+  metrics:
+  - top1_accuracy
+  - macro_f1
+  - per_class_accuracy
+  - per_class_f1
+  - trainable_parameter_count
+  - training_time
+logging:
+  output_dir: experiments/resnet18_lora_layer4_layer3_r4_1_seed42
+  save_best_checkpoint: true
+  save_training_curves: true

@@ -199,9 +199,10 @@ def apply_lora_to_resnet18(model: nn.Module, lora_cfg: dict | LoRAConfig | None)
 
     Supported target modules:
     - ``"fc"``: replace the final classification head with ``LoRALinear``.
-    - ``"layer4"``: replace every Conv2d inside ``model.layer4`` with
-      ``LoRAConv2d``. For this target, set ``train_classifier: true`` in the
-      YAML config so the newly initialized 37-class head can learn normally.
+    - ``"layer1"``/``"layer2"``/``"layer3"``/``"layer4"``: replace every
+      ``nn.Conv2d`` inside the selected residual stage with ``LoRAConv2d``.
+      For residual-stage LoRA experiments, set ``train_classifier: true`` so
+      the newly initialized 37-class head can learn normally.
 
     All existing parameters are frozen first. After replacement, LoRA A/B
     parameters are trainable. The classifier can optionally remain trainable.
@@ -210,14 +211,25 @@ def apply_lora_to_resnet18(model: nn.Module, lora_cfg: dict | LoRAConfig | None)
 
     _freeze_all_parameters(model)
     targets = set(t.lower() for t in cfg.target_modules)
+    supported_residual_stages = {"layer1", "layer2", "layer3", "layer4"}
+    supported_targets = {"fc"} | supported_residual_stages
+
+    unsupported = targets - supported_targets
+    if unsupported:
+        raise ValueError(
+            f"Unsupported LoRA target_modules={sorted(unsupported)}. "
+            f"Supported values are {sorted(supported_targets)}."
+        )
 
     if "fc" in targets:
         model.fc = LoRALinear(model.fc, rank=cfg.rank, alpha=cfg.alpha, dropout=cfg.dropout)
 
-    if "layer4" in targets:
-        for name, module in list(model.layer4.named_modules()):
+    for stage_name in sorted(targets & supported_residual_stages):
+        stage = getattr(model, stage_name)
+        # list(...) is important because we mutate the module tree while iterating.
+        for name, module in list(stage.named_modules()):
             if isinstance(module, nn.Conv2d):
-                full_name = f"layer4.{name}" if name else "layer4"
+                full_name = f"{stage_name}.{name}" if name else stage_name
                 wrapped = LoRAConv2d(
                     module,
                     rank=cfg.rank,
@@ -225,13 +237,6 @@ def apply_lora_to_resnet18(model: nn.Module, lora_cfg: dict | LoRAConfig | None)
                     dropout=cfg.dropout,
                 )
                 _replace_module(model, full_name, wrapped)
-
-    unsupported = targets - {"fc", "layer4"}
-    if unsupported:
-        raise ValueError(
-            f"Unsupported LoRA target_modules={sorted(unsupported)}. "
-            "Supported values are 'fc' and 'layer4'."
-        )
 
     # Ensure LoRA parameters are trainable even though the base model was frozen.
     for module in model.modules():

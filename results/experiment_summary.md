@@ -18,6 +18,15 @@
 | `resnet18_lora_layer4_r4_100_seed42` | Layer4-LoRA | layer4 + fc | 100% | 4 | 14 | 0.9076 | 0.8496 | 0.8473 | 94,757 | 1479.0900s |
 | `resnet18_lora_layer4_r8_100_seed42` | Layer4-LoRA | layer4 + fc | 100% | 8 | 11 | 0.8967 | 0.8397 | 0.8370 | 170,533 | 1463.5800s |
 | `resnet18_lora_layer4_r16_100_seed42` | Layer4-LoRA | layer4 + fc | 100% | 16 | 3 | 0.8886 | 0.8446 | 0.8427 | 322,085 | 1466.9900s |
+| `resnet18_lora_layer4_r4_lr1e4_1_seed42` | Layer4-LoRA LR1e-4 | layer4 + fc | 1% | 4 | 29 | 0.0598 | 0.0777 | 0.0539 | 94,757 | 455.0700s |
+| `resnet18_lora_layer4_r4_lr1e4_10_seed42` | Layer4-LoRA LR1e-4 | layer4 + fc | 10% | 4 | 29 | 0.5707 | 0.5451 | 0.5309 | 94,757 | 554.3900s |
+| `resnet18_lora_layer4_r4_lr1e4_100_seed42` | Layer4-LoRA LR1e-4 | layer4 + fc | 100% | 4 | 29 | 0.8913 | 0.8550 | 0.8526 | 94,757 | 1475.8100s |
+| `resnet18_lora_layer3_r4_1_seed42` | Layer3-LoRA | layer3 + fc | 1% | 4 | 29 | 0.3913 | 0.4058 | 0.3900 | 56,869 | 433.1900s |
+| `resnet18_lora_layer3_r4_10_seed42` | Layer3-LoRA | layer3 + fc | 10% | 4 | 19 | 0.8207 | 0.7871 | 0.7851 | 56,869 | 569.3100s |
+| `resnet18_lora_layer3_r4_100_seed42` | Layer3-LoRA | layer3 + fc | 100% | 4 | 16 | 0.9158 | 0.8795 | 0.8774 | 56,869 | 1704.9600s |
+| `resnet18_lora_layer4_layer3_r4_1_seed42` | Layer4+3-LoRA | layer4+layer3+fc | 1% | 4 | 20 | 0.3886 | 0.3805 | 0.3721 | 132,645 | 456.8500s |
+| `resnet18_lora_layer4_layer3_r4_10_seed42` | Layer4+3-LoRA | layer4+layer3+fc | 10% | 4 | 19 | 0.8071 | 0.7542 | 0.7528 | 132,645 | 577.4200s |
+| `resnet18_lora_layer4_layer3_r4_100_seed42` | Layer4+3-LoRA | layer4+layer3+fc | 100% | 4 | 8 | 0.9158 | 0.8607 | 0.8583 | 132,645 | 1752.3500s |
 | `resnet18_linear_probe_1_seed42` | Linear probe | fc only | 1% | - | 19 | 0.3777 | 0.3876 | 0.3773 | 18,981 | 585.8300s |
 | `resnet18_linear_probe_10_seed42` | Linear probe | fc only | 10% | - | 15 | 0.7446 | 0.7370 | 0.7355 | 18,981 | 709.8500s |
 | `resnet18_linear_probe_100_seed42` | Linear probe | fc only | 100% | - | 8 | 0.8777 | 0.8457 | 0.8422 | 18,981 | 1030.0400s |

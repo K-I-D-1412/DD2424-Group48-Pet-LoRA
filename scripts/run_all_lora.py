@@ -32,6 +32,31 @@ LAYER4_LORA_CONFIGS = [
     "configs/lora_layer4_r16_1.yaml",
 ]
 
+PLACEMENT_LORA_CONFIGS = [
+    # Minimal A-level placement ablation at the best rank r=4.
+    # layer3-only answers "is layer4 special?";
+    # layer4+layer3 answers "does adding more residual stages help?".
+    "configs/lora_layer3_r4_100.yaml",
+    "configs/lora_layer3_r4_10.yaml",
+    "configs/lora_layer3_r4_1.yaml",
+    "configs/lora_layer4_layer3_r4_100.yaml",
+    "configs/lora_layer4_layer3_r4_10.yaml",
+    "configs/lora_layer4_layer3_r4_1.yaml",
+]
+
+LR_SENSITIVITY_CONFIGS = [
+    # Sensitivity check for the main confound: LoRA uses lr=1e-3 while
+    # full fine-tuning uses lr=1e-4. Default to low-label regimes because
+    # this is where Layer4-LoRA is claimed to outperform full fine-tuning.
+    "configs/lora_layer4_r4_lr1e4_10.yaml",
+    "configs/lora_layer4_r4_lr1e4_1.yaml",
+]
+
+LR_SENSITIVITY_ALL_CONFIGS = [
+    "configs/lora_layer4_r4_lr1e4_100.yaml",
+    *LR_SENSITIVITY_CONFIGS,
+]
+
 
 def infer_experiment_dir_from_config(config_path: str) -> Path:
     """
@@ -100,7 +125,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--suite",
-        choices=["fc", "layer4", "all"],
+        choices=["fc", "layer4", "placement", "lr_sensitivity", "lr_sensitivity_all", "all"],
         default="all",
         help="Which LoRA experiments to run. This only means LoRA experiments, not baselines.",
     )
@@ -125,8 +150,19 @@ def main() -> None:
         configs = FC_LORA_CONFIGS
     elif args.suite == "layer4":
         configs = LAYER4_LORA_CONFIGS
+    elif args.suite == "placement":
+        configs = PLACEMENT_LORA_CONFIGS
+    elif args.suite == "lr_sensitivity":
+        configs = LR_SENSITIVITY_CONFIGS
+    elif args.suite == "lr_sensitivity_all":
+        configs = LR_SENSITIVITY_ALL_CONFIGS
     else:
-        configs = FC_LORA_CONFIGS + LAYER4_LORA_CONFIGS
+        configs = (
+            FC_LORA_CONFIGS
+            + LAYER4_LORA_CONFIGS
+            + PLACEMENT_LORA_CONFIGS
+            + LR_SENSITIVITY_CONFIGS
+        )
 
     missing = [cfg for cfg in configs if not Path(cfg).exists()]
     if missing:

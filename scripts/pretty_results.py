@@ -49,6 +49,11 @@ def infer_rank(name: str) -> str:
 
 
 def infer_target(name: str) -> str:
+    # Check more specific LoRA names before broader substrings.
+    if "lora_layer4_layer3" in name:
+        return "layer4+layer3+fc"
+    if "lora_layer3" in name:
+        return "layer3 + fc"
     if "lora_layer4" in name:
         return "layer4 + fc"
     if "lora" in name:
@@ -65,6 +70,13 @@ def infer_target(name: str) -> str:
 
 
 def infer_method(name: str) -> str:
+    # Check more specific LoRA names before broader substrings.
+    if "lora_layer4_r4_lr1e4" in name:
+        return "Layer4-LoRA LR1e-4"
+    if "lora_layer4_layer3" in name:
+        return "Layer4+3-LoRA"
+    if "lora_layer3" in name:
+        return "Layer3-LoRA"
     if "lora_layer4" in name:
         return "Layer4-LoRA"
     if "lora" in name:
@@ -131,11 +143,14 @@ def sort_key(row: dict[str, Any]) -> tuple:
     method_order = {
         "FC-LoRA": 0,
         "Layer4-LoRA": 1,
-        "Linear probe": 2,
-        "Full fine-tuning": 3,
-        "Gradual unfreezing": 4,
-        "Partial fine-tuning": 5,
-        "Binary sanity check": 6,
+        "Layer4-LoRA LR1e-4": 2,
+        "Layer3-LoRA": 3,
+        "Layer4+3-LoRA": 4,
+        "Linear probe": 5,
+        "Full fine-tuning": 6,
+        "Gradual unfreezing": 7,
+        "Partial fine-tuning": 8,
+        "Binary sanity check": 9,
     }
 
     budget_order = {
@@ -348,6 +363,35 @@ def write_report_ready_tables(rows: list[dict[str, Any]]) -> None:
     )
 
     write_small_table(OUT_DIR / "best_lora_vs_baselines.md", baseline_rows)
+
+    # Learning-rate sensitivity check: compare the original Layer4-LoRA r=4
+    # at lr=1e-3 against the lr=1e-4 control and full fine-tuning.
+    sensitivity_names = {
+        "resnet18_finetune_1_seed42",
+        "resnet18_finetune_10_seed42",
+        "resnet18_finetune_100_seed42",
+        "resnet18_lora_layer4_r4_1_seed42",
+        "resnet18_lora_layer4_r4_10_seed42",
+        "resnet18_lora_layer4_r4_100_seed42",
+        "resnet18_lora_layer4_r4_lr1e4_1_seed42",
+        "resnet18_lora_layer4_r4_lr1e4_10_seed42",
+        "resnet18_lora_layer4_r4_lr1e4_100_seed42",
+    }
+
+    sensitivity_rows = [r for r in rows if r["experiment"] in sensitivity_names]
+    sensitivity_rows = sorted(
+        sensitivity_rows,
+        key=lambda r: (
+            {"1%": 0, "10%": 1, "100%": 2}.get(r["budget"], 99),
+            {
+                "Full fine-tuning": 0,
+                "Layer4-LoRA": 1,
+                "Layer4-LoRA LR1e-4": 2,
+            }.get(r["method"], 99),
+        ),
+    )
+
+    write_small_table(OUT_DIR / "lora_lr_sensitivity.md", sensitivity_rows)
 
 
 def main() -> None:

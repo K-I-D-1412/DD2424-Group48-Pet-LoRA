@@ -32,13 +32,27 @@ def parse_budget(b: str) -> str:
     return b.strip()
 
 
+def infer_lora_family(targets: str) -> str:
+    normalized = "+".join(t.strip() for t in targets.split("+") if t.strip())
+    target_set = set(normalized.split("+"))
+    if normalized == "fc":
+        return "FC-LoRA"
+    if normalized == "layer4":
+        return "Layer4-LoRA"
+    if normalized == "layer3":
+        return "Layer3-LoRA"
+    if target_set == {"layer3", "layer4"}:
+        return "Layer4+3-LoRA"
+    return f"LoRA({normalized})"
+
+
 def collect_lora() -> dict[str, dict[str, list[tuple[int, float, int]]]]:
     """budget -> family -> list of (params, test_top1, rank)."""
     rows = read_csv(LORA_CSV)
     out: dict[str, dict[str, list[tuple[int, float, int]]]] = {}
     for r in rows:
         budget = parse_budget(r["budget"])
-        family = "Layer4-LoRA" if r["targets"] == "layer4" else "FC-LoRA"
+        family = infer_lora_family(r["targets"])
         params = int(r["trainable_params"])
         acc = float(r["test_top1"])
         rank = int(r["rank"])
@@ -78,8 +92,10 @@ def collect_baselines() -> dict[str, list[tuple[str, int, float]]]:
 
 
 STYLE = {
-    "FC-LoRA":     dict(color="#4c72b0", marker="o"),
-    "Layer4-LoRA": dict(color="#c44e52", marker="s"),
+    "FC-LoRA":       dict(color="#4c72b0", marker="o"),
+    "Layer4-LoRA":   dict(color="#c44e52", marker="s"),
+    "Layer3-LoRA":   dict(color="#8172b3", marker="X"),
+    "Layer4+3-LoRA": dict(color="#dd8452", marker="v"),
 }
 
 BASELINE_STYLE = {
@@ -95,7 +111,7 @@ def _plot_one(ax, budget: str, lora_by_fam: dict[str, list[tuple[int, float, int
         xs = [p for p, _, _ in pts]
         ys = [a for _, a, _ in pts]
         ranks = [r for _, _, r in pts]
-        st = STYLE[fam]
+        st = STYLE.get(fam, dict(color="#666666", marker="o"))
         ax.plot(xs, ys, linestyle="--", linewidth=1.2, alpha=0.7, color=st["color"])
         ax.scatter(xs, ys, label=fam, s=80, edgecolor="black",
                    linewidth=0.5, **st)

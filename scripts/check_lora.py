@@ -7,7 +7,7 @@ Run from project root:
 import torch
 from torch import nn
 
-from src.lora import LoRALinear, LoRAConv2d
+from src.lora import LoRALinear, LoRAConv2d, apply_lora_to_resnet18
 
 
 def check_lora_linear():
@@ -57,9 +57,40 @@ def check_lora_conv2d():
     print("[OK] LoRAConv2d: shape, initialization, freezing, gradients")
 
 
+def check_lora_resnet_target_modules():
+    # Use a tiny ResNet-like module tree so this check does not need torchvision.
+    class TinyResNetLike(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.layer1 = nn.Sequential(nn.Conv2d(3, 8, 3, padding=1, bias=False))
+            self.layer2 = nn.Sequential(nn.Conv2d(8, 16, 3, padding=1, bias=False))
+            self.layer3 = nn.Sequential(nn.Conv2d(16, 32, 3, padding=1, bias=False))
+            self.layer4 = nn.Sequential(nn.Conv2d(32, 64, 3, padding=1, bias=False))
+            self.fc = nn.Linear(64, 37)
+
+    model = TinyResNetLike()
+    model = apply_lora_to_resnet18(
+        model,
+        {
+            "rank": 4,
+            "alpha": 8,
+            "dropout": 0.0,
+            "target_modules": ["layer4", "layer3"],
+            "train_classifier": True,
+        },
+    )
+    trainable = [name for name, p in model.named_parameters() if p.requires_grad]
+    assert any("layer3" in name and "lora_" in name for name in trainable)
+    assert any("layer4" in name and "lora_" in name for name in trainable)
+    assert any(name.startswith("fc.") for name in trainable)
+    assert not any("base_layer" in name and p.requires_grad for name, p in model.named_parameters())
+    print("[OK] target_modules: layer3/layer4 LoRA + trainable classifier")
+
+
 def main():
     check_lora_linear()
     check_lora_conv2d()
+    check_lora_resnet_target_modules()
     print("All LoRA checks passed.")
 
 
